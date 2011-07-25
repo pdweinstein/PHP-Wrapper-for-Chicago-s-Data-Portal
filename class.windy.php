@@ -52,9 +52,26 @@ class windy {
 	
 	}
 	
-	public function getViews(){
+	/**
+	 *	getViews function, Get views that match a given set of criteria.
+	 * 
+	 *	@access public
+	 *	@param	string	$category filters for views matching this category. Optional. Default: ''
+	 *	@param	string	$name filters for views containing this text in their name Optional. default: ''
+	 *	@param	string	$desc filters for views with this text in their description. Optional. default: ''
+	 *	@param 	string	$tags filters for views matching these tags. Optional. default: ''
+	 *	@param 	string	$full filters for views with this text in the metadata or content. Optional. default: ''
+	 *	@param 	boolean	$count executes the query with the given parameters and only returns the total number of rows
+	 *						ignoring the limit. Optional. default: 'false'
+	 *	@param 	string	$limit the number of results to return, up to 200 at a time. Optional.default: ''
+	 *	@param 	string	$page number to retrieve additional pages of results. Optional.default: ''
+	 *	@return
+	 *
+	 */
+	public function getViews( $category = '', $name = '', $desc = '', $tags = '', $full = '', $count = 'false', $limit = '', $page = '' ) {
 	
-		$response = $this->httpRequest( $this->apiURL. 'views.' .$this->format );
+		$args = 'category=' .urlencode( $category ). '&name=' .urlencode( $name ). '&description=' .urlencode( $desc ). '&tags=' .urlencode( $tags ). '&full=' .urlencode( $full ). '&count=' .urlencode( $count ). '&limit=' .urlencode( $limit ). '&page=' .urlencode( $page );
+		$response = $this->httpRequest( $this->apiURL. 'views.' .$this->format, $args );
 	 
 		if ( $this->format == 'json' ) {
 		
@@ -87,15 +104,15 @@ class windy {
 	}
 	
 	 /**
-	 * httpRequest: A method for handling HTTP requests
+	 *	httpRequest: A method for handling HTTP requests
 	 * 
-	 * @access	private
-	 * @param		string	$requestURL, URL for HTTP request Required
-	 * @param		array	$args, arguments for HTTP request. Optional
-      * @param		bool		$type, Method for HTTP request. Default: GET
-      *					Options: GET, POST, PUT and DELETE
-	 * @return	string	Results of HTTP request 	
-	 * @author	Paul Weinstein
+	 *	@access	private
+	 *	@param	string	$requestURL, URL for HTTP request Required
+	 *	@param	array	$args, arguments for HTTP request. Optional
+      *	@param	bool		$type, Method for HTTP request. Default: GET
+      *						Options: GET, POST, PUT and DELETE
+	 *	@return	string	Results of HTTP request 	
+	 *	@author	Paul Weinstein
 	 *
 	 */
 	private function httpRequest( $reqURL, $args = '', $type = 'GET' ) {
@@ -128,7 +145,7 @@ class windy {
 			
 			if ( $args != '' ) {
 			
-				$reqURL .= "&".$args;
+				$reqURL .= "?".$args;
 
 			}
 		}
