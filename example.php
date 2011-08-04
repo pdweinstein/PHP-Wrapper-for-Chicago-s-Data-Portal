@@ -4,7 +4,7 @@
 
 	// Load our class file and create our object.
 	include_once( 'class.windy.php' );
-	$chicago = new windy( 'xml', '', false );
+	$chicago = new windy( '', '', '', false );
 
 	echo var_dump( $chicago->getViews() );
 

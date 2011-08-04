@@ -3,7 +3,7 @@
 /*
  *   @package		windy-php
  *   @author		Paul Weinstein, <pdw@weinstein.org>
- *   @version		0.1
+ *   @version		0.15
  *	@copyright	Copyright (c) 2011 Paul Weinstein, <pdw@weinstein.org>
  *	@license		MIT License, <https://github.com/pdweinstein/PHP-Wrapper-for-CTA-APIs/blob/master/LICENSE>
  *
@@ -34,17 +34,17 @@ class windy {
 
 	/* 	Format types, JSON, XML, RDF, XLS and XLSX (Execl), CSV, TXT, PDF
 		All these different formats, what to do?
-		If the format is developer centric, let's take the extra step and give the developer
-		something to run with. For example, if JSON, let's go ahead and decode it. 
-		Note: This means for XML we'll need SimpleXML installed. For RDF it will mean having to add http://pear.php.net/package/RDF
-		Note: And to make this even more fun, our CSV parser function, str_getcsv is PHP 5.3 or greater 
-			
-		On the other hand, if the format is user centric, let's just dump it to the developer
-		and let them figure out what to do with it.
+		Initial idea: if the format is developer centric, let's take the extra step and give the developer
+		something to run with. For example, if JSON, let's go ahead and decode it a return a usable object or array
+		For XML this would mean the developer would need SimpleXML installed. For RDF it would mean having to add http://pear.php.net/package/RDF
+		and to make this even more fun, our CSV parser function, str_getcsv is PHP 5.3 or greater 
+		
+		So this could get real messy, real fast. Instead let's try this: Everything we call for is via JSON an we'll decode into an object. If the
+		developer wants an array instead, they can specify that. Otherwise, if they want XML or XLS or whatever, they're on their own.
 	*/
 	
 	// API key can be provided for additional functionality, but not required.
-	public function __construct( $format, $apiKey = '', $debug = false ) {
+	public function __construct( $format = 'json', $type = 'object', $apiKey = '', $debug = false ) {
 	
 		$this->format = $format;
 		$this->apiKey = $apiKey;
@@ -64,7 +64,7 @@ class windy {
 	 *	@param 	boolean	$count executes the query with the given parameters and only returns the total number of rows
 	 *						ignoring the limit. Optional. default: 'false'
 	 *	@param 	string	$limit the number of results to return, up to 200 at a time. Optional.default: ''
-	 *	@param 	string	$page number to retrieve additional pages of results. Optional.default: ''
+	 *	@param 	string	$page number to retrieve additional pages of results. Optional. default: ''
 	 *	@return
 	 *
 	 */
@@ -73,34 +73,223 @@ class windy {
 		$args = 'category=' .urlencode( $category ). '&name=' .urlencode( $name ). '&description=' .urlencode( $desc ). '&tags=' .urlencode( $tags ). '&full=' .urlencode( $full ). '&count=' .urlencode( $count ). '&limit=' .urlencode( $limit ). '&page=' .urlencode( $page );
 		$response = $this->httpRequest( $this->apiURL. 'views.' .$this->format, $args );
 	 
-		if ( $this->format == 'json' ) {
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
 		
 			return json_decode( $response );
 		
-		} else if ( $this->format == 'xml' ) {
-		
-			return simplexml_load_string( $response ); 
-	
-		} else if ( $this->format == 'csv' ) {
-		
-			$return = array();
-			
-			// First let us split up each line of data into an array
-			$lines = str_getcsv( $response, '\n' ); 
-			$noLines = sizeof( $lines );
-			
-			for( $counter = 0; $counter <= $noLines; $counter++ ) {
-			
-				$return[$counter] = str_getcsv( $lines[$counter], ',' );
-			
-			}
-		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
 		} else {
 		
 			return $response;
 		
 		}
 		
+	}
+	
+	public function getViewsByID( $viewID ) {
+
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}				
+	
+	}
+	
+	public function getColumnViewsByViewID( $viewID ) {
+	
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/columns.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}					
+	
+	}
+	
+	public function getColumnViewsByColumnID( $viewID, $columnID ) {
+	
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/columns/' .$columnID. '.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	}
+	
+	public function getSubColumns( $viewID, $columnID ) {
+
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/columns/' .$columnID. '/sub_columns.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}
+			
+	}
+
+	// Should take a filename and path arguments and save file in specificed location?
+	public function getFileByViewID( $fileID, $viewID ) {
+	
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/files/' .$fileID );		
+		return $response;
+			
+	}
+
+	/*
+	string	view ID is the ID of the view that contains the row, Required
+	boolean	row_ids_only the service will only return row IDs id true. Optional. Default is false.
+	integer	max_rows is the limit the number of rows returned. Optional. Default '' (return all rows).
+	integer	include_ids_after, include this number of rows, after which only row IDs are returned. Optional. Default ''
+	string	search, run a full text search on the view and only return rows/ids that match. Optional. Default ''
+	boolean	meta, if set to 'true', will write the view object. Only valid if rendering JSON. Optional. Default is true.
+	boolean	as_hashes, if set to 'true', write fields in hash format. Otherwise, write fields in array. 
+				Only valid if rendering JSON. Default to false (array).
+	boolean	most_recent, if set to 'true', return only the most recent rows added to the dataset. Only valid if rendering RSS. Default to true.
+	string	access_type, valid values are PRINT, EMAIL, API, RSS, WIDGET, DOWNLOAD, WEBSITE Optional. Default ''
+	*/	
+	public function getRows( $viewID, $row_ids_only = 'false', $max_rows, $include_ids_after, $search, $meta = 'true', $as_hashes = 'false', $most_recent = 'true', $access_type ) {
+	
+			$args = 'row_ids_only=' .urlencode( $row_ids_only ). '&max_rows=' .urlencode( $max_rows ). '&include_ids_after=' .urlencode( $include_ids_after ). '&search=' .urlencode( $search ). '&meta=' .urlencode( $meta ). '&as_hashes=' .urlencode( $as_hashes ). '&most_recent=' .urlencode( $most_recent ). '&access_type=' .urlencode( $access_type );
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. 'rows.' .$this->format, $args );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}
+	
+	}
+	
+	public function getRowByRowID( $viewID, $rowID ) {
+	
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/rows/' .$rowID. '.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}		
+	
+	
+	}
+	
+	// Note: You must have read permissions on the view to access this resource.
+	public function getAllRowTags( $viewID, $rowID ) {
+
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/rows/' .$rowID. '/tags.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	}
+	
+	public function getAllViewTags( $viewID ) {
+	
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/tags.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	}
+	
+	public function getAllViewUserTags( $viewID ) {
+	
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/user_tags.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
 	}
 	
 	 /**
