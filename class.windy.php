@@ -43,7 +43,21 @@ class windy {
 		developer wants an array instead, they can specify that. Otherwise, if they want XML or XLS or whatever, they're on their own.
 	*/
 	
-	// API key can be provided for additional functionality, but not required.
+	/**
+	 *	__construct function, let's get this object created.
+	 * 
+	 *	@access	public
+	 *	@param	string	$format is what format to provide the data in. Supported format types include:
+	 *						JSON, XML, RDF, XLS and XLSX (Execl), CSV, TXT, PDF
+	 *						If JSON is choosen, the default option, then the next argument, $type allows for accesing the data from an object
+	 *						or an array. For all other formats, it's  developer's choice as to how to handle the raw data format. 
+	 *						Optional. default: 'json'
+	 *	@param	string	$type allows for what data type to provided the featched data in, if the inital format is JSON. 
+	 *						Data can be provided in object or an array. Optional. default: 'object'
+	 *	@param	string	$apiKey can be provided for additional functionality, but is not required. Optional. default: ''
+	 *	@param	bool		$debug turn on debugging. Optional. (default: false)
+	 *
+	 */
 	public function __construct( $format = 'json', $type = 'object', $apiKey = '', $debug = false ) {
 	
 		$this->format = $format;
@@ -65,7 +79,7 @@ class windy {
 	 *						ignoring the limit. Optional. default: 'false'
 	 *	@param 	string	$limit the number of results to return, up to 200 at a time. Optional.default: ''
 	 *	@param 	string	$page number to retrieve additional pages of results. Optional. default: ''
-	 *	@return
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
 	 *
 	 */
 	public function getViews( $category = '', $name = '', $desc = '', $tags = '', $full = '', $count = 'false', $limit = '', $page = '' ) {
@@ -89,6 +103,14 @@ class windy {
 		
 	}
 	
+	/**
+	 *	getViewsByID function provides a method to retrieve metadata about a view using its ID:
+	 * 
+	 *	@access	public
+	 *	@param	string	$viewID of what view wish to retrieve metadata for
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.	
+	 *
+	 */
 	public function getViewsByID( $viewID ) {
 
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '.' .$this->format );
@@ -109,6 +131,14 @@ class windy {
 	
 	}
 	
+	/**
+	 *	getColumnViewsByViewID function provides a method to get metadata about all of the columns on a given view
+	 * 
+	 *	@access 	public
+	 *	@param 	string	$viewID for what view to retreive column metadata for.
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
 	public function getColumnViewsByViewID( $viewID ) {
 	
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/columns.' .$this->format );
@@ -129,6 +159,15 @@ class windy {
 	
 	}
 	
+	/**
+	 *	getColumnViewsByColumnID function provides metadata about a particular columns on a given view
+	 * 
+	 *	@access	public
+	 *	@param	string	$viewID the view id to retreive
+	 *	@param	integer	$columnID the view's cooresponding column id 
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
 	public function getColumnViewsByColumnID( $viewID, $columnID ) {
 	
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/columns/' .$columnID. '.' .$this->format );
@@ -149,6 +188,15 @@ class windy {
 	
 	}
 	
+	/**
+	 *	getSubColumns function provides all of the sub-columns for a given nested table.
+	 * 
+	 *	@access	public
+	 *	@param	string	$viewID the view id to retreive
+	 *	@param	integer	$columnID the view's cooresponding column id 
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
 	public function getSubColumns( $viewID, $columnID ) {
 
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/columns/' .$columnID. '/sub_columns.' .$this->format );
@@ -170,25 +218,39 @@ class windy {
 	}
 
 	// Should take a filename and path arguments and save file in specificed location?
+	/**
+	 * 	getFileByViewID function retrieves a file that has been attached to a view.
+	 * 
+	 *	@access	public
+	 *	@param	string	$fileID is the id of the file to fetch
+	 *	@param	mixed	$viewID is the view the file is attached to
+	 *	@return	mixed	Returns the requested file
+	 */
 	public function getFileByViewID( $fileID, $viewID ) {
 	
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/files/' .$fileID );		
 		return $response;
 			
 	}
+	
+	/**
+	 *	getRows function retrieve multiple rows from a view as nested arrays instead of in the expanded form.
+	 * 
+	 *	@param	string	view ID is the ID of the view that contains the row, Required
+	 *	@param	boolean	row_ids_only the service will only return row IDs id true. Optional. Default is false.
+	 *	@param	integer	max_rows is the limit the number of rows returned. Optional. Default '' (return all rows).
+	 *	@param	integer	include_ids_after, include this number of rows, after which only row IDs are returned. Optional. Default ''
+	 *	@param	string	search, run a full text search on the view and only return rows/ids that match. Optional. Default ''
+	 *	@param	boolean	meta, if set to 'true', will write the view object. Only valid if rendering JSON. Optional. Default is true.
+	 *	@param	boolean	as_hashes, if set to 'true', write fields in hash format. Otherwise, write fields in array. 
+							Only valid if rendering JSON. Default to false (array).
+	 *	@param	boolean	most_recent, if set to 'true', return only the most recent rows added to the dataset. Only valid if rendering RSS. 
+	 						Default to true.
+	 *	@param	string	access_type, valid values are PRINT, EMAIL, API, RSS, WIDGET, DOWNLOAD, WEBSITE Optional. Default ''
 
-	/*
-	string	view ID is the ID of the view that contains the row, Required
-	boolean	row_ids_only the service will only return row IDs id true. Optional. Default is false.
-	integer	max_rows is the limit the number of rows returned. Optional. Default '' (return all rows).
-	integer	include_ids_after, include this number of rows, after which only row IDs are returned. Optional. Default ''
-	string	search, run a full text search on the view and only return rows/ids that match. Optional. Default ''
-	boolean	meta, if set to 'true', will write the view object. Only valid if rendering JSON. Optional. Default is true.
-	boolean	as_hashes, if set to 'true', write fields in hash format. Otherwise, write fields in array. 
-				Only valid if rendering JSON. Default to false (array).
-	boolean	most_recent, if set to 'true', return only the most recent rows added to the dataset. Only valid if rendering RSS. Default to true.
-	string	access_type, valid values are PRINT, EMAIL, API, RSS, WIDGET, DOWNLOAD, WEBSITE Optional. Default ''
-	*/	
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
 	public function getRows( $viewID, $row_ids_only = 'false', $max_rows, $include_ids_after, $search, $meta = 'true', $as_hashes = 'false', $most_recent = 'true', $access_type ) {
 	
 			$args = 'row_ids_only=' .urlencode( $row_ids_only ). '&max_rows=' .urlencode( $max_rows ). '&include_ids_after=' .urlencode( $include_ids_after ). '&search=' .urlencode( $search ). '&meta=' .urlencode( $meta ). '&as_hashes=' .urlencode( $as_hashes ). '&most_recent=' .urlencode( $most_recent ). '&access_type=' .urlencode( $access_type );
@@ -210,6 +272,15 @@ class windy {
 	
 	}
 	
+	/**
+	 * 	getRowByRowID function retrieve the expanded representation of a particular row by ID. 
+	 * 
+	 *	@access 	public
+	 *	@param	string	$viewID is the identifier of the view that contains the row
+	 *	@param	string	$rowID is the ID of the row to retrieve
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
 	public function getRowByRowID( $viewID, $rowID ) {
 	
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/rows/' .$rowID. '.' .$this->format );
@@ -232,6 +303,15 @@ class windy {
 	}
 	
 	// Note: You must have read permissions on the view to access this resource.
+	/**
+	 *	getAllRowTags function will etrieve all of the tags for a particular row.
+	 * 
+	 *	@access	public
+	 *	@param	string	$viewID would be the ID of the view that contains the row
+	 *	@param	string	$rowID is of course the ID of the row for which to return tags
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
 	public function getAllRowTags( $viewID, $rowID ) {
 
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/rows/' .$rowID. '/tags.' .$this->format );
@@ -252,6 +332,14 @@ class windy {
 	
 	}
 	
+	/**
+	 *	getAllViewTags function provides a method for retrieving tags for a view
+	 * 
+	 *	@access	public
+	 *	@param	string	$viewID the ID for the view
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
 	public function getAllViewTags( $viewID ) {
 	
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/tags.' .$this->format );
@@ -272,6 +360,14 @@ class windy {
 	
 	}
 	
+	/**
+	 *	getAllViewUserTags function allows for the retrieval of user tags for a view
+	 * 
+	 *	@access	public
+	 *	@param	string	$viewID the ID for the view
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
 	public function getAllViewUserTags( $viewID ) {
 	
 		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/user_tags.' .$this->format );
