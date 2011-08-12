@@ -6,6 +6,7 @@
 	include_once( 'class.windy.php' );
 	$chicago = new windy( '', '', '', false );
 
-	echo var_dump( $chicago->getViews() );
+	//echo var_dump( $chicago->getViews() );
+	echo var_dump( $chicago->getDocsByID( 'views' ) )
 
 ?>

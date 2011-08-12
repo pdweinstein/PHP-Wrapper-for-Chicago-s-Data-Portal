@@ -173,6 +173,54 @@ class windy {
 	
 	}
 
+	public function getDocs() {
+	
+		$response = $this->httpRequest( $this->apiURL. 'docs' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	}
+	
+	/**
+	 * getDocsByID function retrieve documentation on a specific service.
+	 * 
+	 *	@access	public
+	 *	@param	string	$docID is the service URL root such as views or user for which documentation to retrieve. Required.
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
+	public function getDocsByID( $docID ) {
+
+		$response = $this->httpRequest( $this->apiURL. 'docs/' .$docID. '.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	}
+
 	/**
 	 *	getViews function, Get views that match a given set of criteria.
 	 * 
