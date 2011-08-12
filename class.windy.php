@@ -66,6 +66,113 @@ class windy {
 	
 	}
 	
+
+	/**
+	 *	getUsers function provides a method to query for all users. 
+	 *		The resulting output will include summary information about the users within the page.
+	 * 
+	 *	@access	public
+	 *	@param	string	$name, a name to search for. Optional. Default: ''
+	 *	@param	string	$tags a set of tags to seach for. Optional. Default: ''
+	 *	@param	integer	$limit is the total number of results to return. Can't exceed 200. Optional. Default: ''
+	 *	@param 	integer	$page is the page number to offset the results by. Offset is (page-1) * limit. Optional. Default: ''
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
+	public function getUsers( $name = '', $tags = '', $limit = '', $page = '' ) {
+
+		$args = 'name=' .urldecode( $name ). '&tags=' .urldecode( $tags ). '&limit=' .urldecode( $limit ). '&page=' .urldecode( $page ) ;	
+		$response = $this->httpRequest( $this->apiURL. 'users.' .$this->format, $args );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}
+		
+	}
+	
+	/**
+	 *	getUserByID function will retrieve a specific user by username or user ID. Can also fetch user profile information or image
+	 * 
+	 *	@access	public
+	 *	@param	string	$userID is the username or user ID of the desired user. Required.
+	 *	@param	string	$profile can profile a user's contacts, groups, picklists, views or profile image. Optional Default: ''
+	 *						Valid parameters are "contacts", "groups", "picklists", "views" or "image"
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
+	public function getUserByID( $userID, $profile = '' ) {
+	
+		if ( $profile == 'image' ) {
+		
+			$response = $this->httpRequest( $this->apiURL. 'users/' .$userID. '/profile_images' );
+		
+		} else if (( $profile != 'image' ) AND ( $profile != '' )) {
+	
+			$response = $this->httpRequest( $this->apiURL. 'users/' .$userID. '/' .$profile. '.' .$this->format );	
+		
+		} else {
+
+			$response = $this->httpRequest( $this->apiURL. 'users/' .$userID. '.' .$this->format );
+
+		}
+		
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	
+	}
+	
+	/**
+	 *	getUserViews function will retrieve a list of the views that a user has created.
+	 *		If unauthenticated, only their public views will be returned. 
+	 *		Authenticated users will also see views that have been shared to them, and will be able to see private views from their own account.
+	 * 
+	 *	@access	public
+	 *	@param	string	$userID is the username or user ID whose views to retrieve. Required.
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
+	public function getUserViews( $userID ) {
+	
+		$response = $this->httpRequest( $this->apiURL. 'users/' .$userID. '/views.' .$this->format );
+		
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	}
+
 	/**
 	 *	getViews function, Get views that match a given set of criteria.
 	 * 
