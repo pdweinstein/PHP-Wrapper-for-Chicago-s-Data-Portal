@@ -4,9 +4,10 @@
 
 	// Load our class file and create our object.
 	include_once( 'class.windy.php' );
-	$chicago = new windy( '', '', '', false );
+	$chicago = new windy();
 
-	//echo var_dump( $chicago->getViews() );
-	echo var_dump( $chicago->getDocsByID( 'views' ) )
+	echo var_dump( $chicago->getViews() );
+	//echo var_dump( $chicago->getDocs() );
+	//echo var_dump( $chicago->getDocsByID( 'views' ))
 
 ?>

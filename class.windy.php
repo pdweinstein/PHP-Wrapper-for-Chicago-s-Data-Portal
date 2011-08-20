@@ -61,6 +61,7 @@ class windy {
 	public function __construct( $format = 'json', $type = 'object', $apiKey = '', $debug = false ) {
 	
 		$this->format = $format;
+		$this->type = $type;
 		$this->apiKey = $apiKey;
 		$this->debug = $debug;	
 	
@@ -174,8 +175,8 @@ class windy {
 	}
 
 	public function getDocs() {
-	
-		$response = $this->httpRequest( $this->apiURL. 'docs' .$this->format );
+
+		$response = $this->httpRequest( $this->apiURL. 'api/docs.' .$this->format );
 
 		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
 		
@@ -203,7 +204,7 @@ class windy {
 	 */
 	public function getDocsByID( $docID ) {
 
-		$response = $this->httpRequest( $this->apiURL. 'docs/' .$docID. '.' .$this->format );
+		$response = $this->httpRequest( $this->apiURL. 'api/docs/' .$docID. '.' .$this->format );
 
 		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
 		
@@ -243,9 +244,9 @@ class windy {
 		$response = $this->httpRequest( $this->apiURL. 'views.' .$this->format, $args );
 	 
 		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
-		
+
 			return json_decode( $response );
-		
+
 		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
 
 			return json_decode( $response, true );
