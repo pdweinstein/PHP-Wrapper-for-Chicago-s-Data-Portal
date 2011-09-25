@@ -3,7 +3,7 @@
 /*
  *   @package		windy-php
  *   @author		Paul Weinstein, <pdw@weinstein.org>
- *   @version		0.5
+ *   @version		0.75
  *	@copyright	Copyright (c) 2011 Paul Weinstein, <pdw@weinstein.org>
  *	@license		MIT License, <https://github.com/pdweinstein/PHP-Wrapper-for-CTA-APIs/blob/master/LICENSE>
  *
