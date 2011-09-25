@@ -3,7 +3,7 @@
 /*
  *   @package		windy-php
  *   @author		Paul Weinstein, <pdw@weinstein.org>
- *   @version		0.15
+ *   @version		0.5
  *	@copyright	Copyright (c) 2011 Paul Weinstein, <pdw@weinstein.org>
  *	@license		MIT License, <https://github.com/pdweinstein/PHP-Wrapper-for-CTA-APIs/blob/master/LICENSE>
  *
@@ -26,7 +26,8 @@
 // Class is in session
 class windy {
 
-	var $apiURL = 'data.cityofchicago.org/';
+	var $chicagoAPIURL = 'data.cityofchicago.org/api/';
+	var $cookAPIURL = 'datacatalog.cookcountyil.gov/api/';
 	var $apiKey = '';
 	var $format = '';
 	var $timeout = '300';
@@ -47,6 +48,8 @@ class windy {
 	 *	__construct function, let's get this object created.
 	 * 
 	 *	@access	public
+	 *	@param	string	$source is flag to set which Socrata data source to use, City of Chicago's or Cook County's. Takes
+	 *						'city' for City of Chicago and 'county' for Cook County
 	 *	@param	string	$format is what format to provide the data in. Supported format types include:
 	 *						JSON, XML, RDF, XLS and XLSX (Execl), CSV, TXT, PDF
 	 *						If JSON is choosen, the default option, then the next argument, $type allows for accesing the data from an object
@@ -58,7 +61,17 @@ class windy {
 	 *	@param	bool		$debug turn on debugging. Optional. (default: false)
 	 *
 	 */
-	public function __construct( $format = 'json', $type = 'object', $apiKey = '', $debug = false ) {
+	public function __construct( $source, $format = 'json', $type = 'object', $apiKey = '', $debug = false ) {
+	
+		if ( $source == 'county' ) {
+		
+			$this->apiURL = $this->cookAPIURL;
+		
+		} else if ( $source == 'city' ) {
+		
+			$this->apiURL = $this->chicagoAPIURL;
+		
+		}
 	
 		$this->format = $format;
 		$this->type = $type;
@@ -66,8 +79,63 @@ class windy {
 		$this->debug = $debug;	
 	
 	}
-	
 
+/*
+	public function getAuthentication( $username, $password ) {
+	
+		$response = $this->httpRequest( $this->apiURL. 'api/docs.' .$this->format );
+	
+	
+	}
+*/	
+	public function getDocs() {
+
+		$response = $this->httpRequest( $this->apiURL. 'api/docs.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	}
+	
+	/**
+	 * getDocsByID function retrieve documentation on a specific service.
+	 * 
+	 *	@access	public
+	 *	@param	string	$docID is the service URL root such as views or user for which documentation to retrieve. Required.
+	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
+	 *
+	 */
+	public function getDocsByID( $docID ) {
+
+		$response = $this->httpRequest( $this->apiURL. 'api/docs/' .$docID. '.' .$this->format );
+
+		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
+		
+			return json_decode( $response );
+		
+		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
+
+			return json_decode( $response, true );
+
+		} else {
+		
+			return $response;
+		
+		}	
+	
+	}
+	
 	/**
 	 *	getUsers function provides a method to query for all users. 
 	 *		The resulting output will include summary information about the users within the page.
@@ -158,54 +226,6 @@ class windy {
 	
 		$response = $this->httpRequest( $this->apiURL. 'users/' .$userID. '/views.' .$this->format );
 		
-		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
-		
-			return json_decode( $response );
-		
-		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
-
-			return json_decode( $response, true );
-
-		} else {
-		
-			return $response;
-		
-		}	
-	
-	}
-
-	public function getDocs() {
-
-		$response = $this->httpRequest( $this->apiURL. 'api/docs.' .$this->format );
-
-		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
-		
-			return json_decode( $response );
-		
-		} else if (( $this->format == 'json' ) AND ( $this->type == 'array' )) { 
-
-			return json_decode( $response, true );
-
-		} else {
-		
-			return $response;
-		
-		}	
-	
-	}
-	
-	/**
-	 * getDocsByID function retrieve documentation on a specific service.
-	 * 
-	 *	@access	public
-	 *	@param	string	$docID is the service URL root such as views or user for which documentation to retrieve. Required.
-	 *	@return	mixed	An orbject, array or raw data, depending on format and type choosen what object created.
-	 *
-	 */
-	public function getDocsByID( $docID ) {
-
-		$response = $this->httpRequest( $this->apiURL. 'api/docs/' .$docID. '.' .$this->format );
-
 		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
 		
 			return json_decode( $response );
@@ -556,10 +576,17 @@ class windy {
 	 *	@author	Paul Weinstein
 	 *
 	 */
-	private function httpRequest( $reqURL, $args = '', $type = 'GET' ) {
+	private function httpRequest( $reqURL, $args = '', $type = 'GET', $secure = false ) {
 
+		if ( $secure ) {
 		
-		$reqURL = 'http://' .$reqURL;
+			$reqURL = 'https://' .$reqURL;
+		
+		} else {
+		
+			$reqURL = 'http://' .$reqURL;
+		
+		}
 			
 		// Configure cURL for our request
 		$curl_handle = curl_init();
