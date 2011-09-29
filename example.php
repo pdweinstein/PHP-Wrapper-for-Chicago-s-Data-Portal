@@ -21,7 +21,7 @@
 					
 			$file = $chicago->getFileByViewID( $view->blobId, $view->id );
 
-			// Foreknowledge tells us this is an XML file, so let's use SimpleXML to parse this data
+			// Since KML is an XML notation for expressing geographic annotation, let's use SimpleXML to parse this data
 			// Note: SimpleXML requires the libxml PHP extension
 			$xml = simplexml_load_string( $file );
 
@@ -47,5 +47,10 @@
 	//$cook = new windy( 'county' );
 	
 	//echo var_dump( $cook->getViews() );
+
+	// Create an object to get state data
+	//$illinois = new windy( 'state' );
+	
+	//echo var_dump( $illinois->getViews() );
 
 ?>

@@ -3,7 +3,7 @@
 /*
  *   @package		windy-php
  *   @author		Paul Weinstein, <pdw@weinstein.org>
- *   @version		0.75
+ *   @version		0.8
  *	@copyright	Copyright (c) 2011 Paul Weinstein, <pdw@weinstein.org>
  *	@license		MIT License, <https://github.com/pdweinstein/PHP-Wrapper-for-CTA-APIs/blob/master/LICENSE>
  *
@@ -28,31 +28,39 @@ class windy {
 
 	var $chicagoAPIURL = 'data.cityofchicago.org/api/';
 	var $cookAPIURL = 'datacatalog.cookcountyil.gov/api/';
+	var $illinoisAPIURL = 'data.illinois.gov/api/';
 	var $apiKey = '';
 	var $format = '';
 	var $timeout = '300';
 	var $debug = false;
 
-	/* 	Format types, JSON, XML, RDF, XLS and XLSX (Execl), CSV, TXT, PDF
-		All these different formats, what to do?
+	/* 	Format types, JSON, XML, RDF, XLS and XLSX (Execl), CSV, TXT, PDF All these different formats, what to do?
+		
 		Initial idea: if the format is developer centric, let's take the extra step and give the developer
 		something to run with. For example, if JSON, let's go ahead and decode it a return a usable object or array
-		For XML this would mean the developer would need SimpleXML installed. For RDF it would mean having to add http://pear.php.net/package/RDF
+		For XML this would mean the developer would need libXML installed. For RDF it would mean having to add http://pear.php.net/package/RDF
 		and to make this even more fun, our CSV parser function, str_getcsv is PHP 5.3 or greater 
 		
 		So this could get real messy, real fast. Instead let's try this: Everything we call for is via JSON an we'll decode into an object. If the
 		developer wants an array instead, they can specify that. Otherwise, if they want XML or XLS or whatever, they're on their own.
+		
+		
+		The initial plan for this class file didn't include supporting multiple data portals, but both the county and state have adapted Socrata's platform, 
+		so adding these sources is "trivial". Trival that is if the implementation is at the object level, as currently done. But should choosing a data source 
+		be an object-level choice OR should it be at the method/function level where an additional parameter sets which data source to use for that specific moment?
+		
+		
 	*/
 	
 	/**
 	 *	__construct function, let's get this object created.
 	 * 
 	 *	@access	public
-	 *	@param	string	$source is flag to set which Socrata data source to use, City of Chicago's or Cook County's. Takes
-	 *						'city' for City of Chicago and 'county' for Cook County
+	 *	@param	string	$source is flag to set which Socrata data source to use, City of Chicago's, Cook County's or State of Illinois'. Takes
+	 *						'city' for City of Chicago, 'county' for Cook County and 'state' for State of Illinois
 	 *	@param	string	$format is what format to provide the data in. Supported format types include:
 	 *						JSON, XML, RDF, XLS and XLSX (Execl), CSV, TXT, PDF
-	 *						If JSON is choosen, the default option, then the next argument, $type allows for accesing the data from an object
+	 *						If JSON is chosen, the default option, then the next argument, $type allows for accessing the data from an object
 	 *						or an array. For all other formats, it's  developer's choice as to how to handle the raw data format. 
 	 *						Optional. default: 'json'
 	 *	@param	string	$type allows for what data type to provided the featched data in, if the inital format is JSON. 
@@ -63,7 +71,11 @@ class windy {
 	 */
 	public function __construct( $source, $format = 'json', $type = 'object', $apiKey = '', $debug = false ) {
 	
-		if ( $source == 'county' ) {
+		if ( $source == 'state' ) {
+		
+			$this->apiURL = $this->illinoisAPIURL;
+		
+		} else if ( $source == 'county' ) {
 		
 			$this->apiURL = $this->cookAPIURL;
 		

@@ -1,1 +1,30 @@
-The beginnings of a PHP Wrapper for accessing City of Chicago data made available using Socrata's Open Data Platform 
+This PHP class file is an API wrapper for interfacing with the City of Chicago's data portal which is made available using Socrata's Open Data Platform 
+
+Since Cook County and the State of Illinois have also adopted Socrata's data platform, support for those data portals has also been included in this class file.
+
+DEPENDENCIES
+This class file depends on PHP support of Client URL Library (cURL). In addition the example's in example.php require SimpleXML for parsing XML data.
+
+PHP's cURL functions are themselves built on libcurl, a library that enables support for a number of different network protocols. Information on how to build and enable cURL support in PHP can be found at: http://php.net/manual/en/book.curl.php
+
+SimpleXML is a PHP extension that provides a simple and easily toolset for managing XML by converting XML data into an object. Similar to cURL, SimpleXML is itself dependent on libxml. Information on how to add SimpleXML can be found at: http://php.net/manual/en/book.simplexml.php
+
+INSTALLATION
+To install and use this class and its functions, simply copy the class.windy.php file into a directory that is accessible by your PHP script and include the file using the include (or similar require) function. Example:
+
+	// Load the class file in our current directory
+	include_once( 'class.windy.php' );
+	
+Once the class file has been loaded, the next step is to instantiate the class:
+	
+	// Create an object to get city data
+	$chicago = new windy( 'city' );
+	
+Since the class file includes support for city, county and state data portals, the object constructor requires at least one argument, Takes, 'city' for City of Chicago, 'county' for Cook County and 'state' for State of Illinois
+
+To invoke a method simple use the object and related function, providing an additional information as parameters:
+
+	// Let's find any views that describe themselves as about Chicago's neighborhood boundaries and are tagged with KML data
+	$views = $chicago->getViews( '', '', 'neighborhood boundaries', 'kml', '', 'false', '', '' );
+	
+Further examples can be found in the provided example.php file.
