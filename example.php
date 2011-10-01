@@ -16,7 +16,7 @@
 	
 		echo "View ID: ".$view->id. " is named " .$view->name. " and is described as a " .$view->description. "\n\n";
 	
-		// With a little foreknowledge View ID buma-fjbv looks interesting, let's get that file
+		// With our foreknowledge of datasets the file with view id buma-fjbv looks interesting, let's get that file
 		if ( $view->id == 'buma-fjbv' ) {
 					
 			$file = $chicago->getFileByViewID( $view->blobId, $view->id );
@@ -40,17 +40,23 @@
 	
 	}
 
+	// Get the documents on how to use the data portal 
 	//echo var_dump( $chicago->getDocs() );
-	//echo var_dump( $chicago->getDocsByID( 'views' ))
 
 	// Create an object to get county data
-	//$cook = new windy( 'county' );
+	$cook = new windy( 'county' );
+
+	// Let's find any views that describe the boundaries of the county forest preserves
+	$views = $cook->getViews( '', '', '', 'county park boundaries', '', 'false', '', '' );
 	
-	//echo var_dump( $cook->getViews() );
+	echo "Here are the views with a description including 'county park boundaries':\n";
+	foreach ( $views as $view ) {
+	
+		echo "View ID: ".$view->id. " is named " .$view->name. " and is described as a " .$view->description. "\n\n";
+	
+	}
 
 	// Create an object to get state data
-	//$illinois = new windy( 'state' );
-	
-	//echo var_dump( $illinois->getViews() );
+	$illinois = new windy( 'state' );
 
 ?>
