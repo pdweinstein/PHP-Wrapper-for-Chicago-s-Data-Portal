@@ -2,6 +2,9 @@ This PHP class file is an API wrapper for interfacing with the City of Chicago's
 
 Since Cook County and the State of Illinois have also adopted Socrata's data platform, support for those data portals has also been included in this class file.
 
+As of March 2012, the city, county and state have come together to create MetroChicagoData.org, a Socrata driven portal that brings data from the City of Chicago, Cook County and the State of Illinois into one single interface. However, it should be noted that at this time (March 2012) the datasets on MetroChicagoData have not undergone any sort of normalization process. That this the datasets are still independent of each other, with there own structure and relationships as if gathered from each individual data portal separately.  
+
+Future versions of this class may adopt the single all encompassing portal. For now support for all four is being maintained. 
 
 DEPENDENCIES
 This class file depends on PHP support of Client URL Library (cURL). In addition the example's in example.php require SimpleXML for parsing XML data.

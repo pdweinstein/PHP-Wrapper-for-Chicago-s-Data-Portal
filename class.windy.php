@@ -29,6 +29,7 @@ class windy {
 	var $chicagoAPIURL = 'data.cityofchicago.org/api/';
 	var $cookAPIURL = 'datacatalog.cookcountyil.gov/api/';
 	var $illinoisAPIURL = 'data.illinois.gov/api/';
+	var $combinedAPIURL = 'www.metrochicagodata.org/api/';
 	var $apiKey = '';
 	var $format = '';
 	var $timeout = '300';
@@ -41,14 +42,13 @@ class windy {
 		For XML this would mean the developer would need libXML installed. For RDF it would mean having to add http://pear.php.net/package/RDF
 		and to make this even more fun, our CSV parser function, str_getcsv is PHP 5.3 or greater 
 		
-		So this could get real messy, real fast. Instead let's try this: Everything we call for is via JSON an we'll decode into an object. If the
+		This could get real messy, real fast. Instead let's try this: Everything we call for is via JSON an we'll decode into an object. If the
 		developer wants an array instead, they can specify that. Otherwise, if they want XML or XLS or whatever, they're on their own.
 		
 		
-		The initial plan for this class file didn't include supporting multiple data portals, but both the county and state have adapted Socrata's platform, 
-		so adding these sources is "trivial". Trival that is if the implementation is at the object level, as currently done. But should choosing a data source 
-		be an object-level choice OR should it be at the method/function level where an additional parameter sets which data source to use for that specific moment?
+		The initial plan for this class file didn't include supporting multiple data portals, but both the county and state have adapted Socrata's platform, so adding these sources is "trivial". Trival that is if the implementation is at the object level, as currently done. But should choosing a data source be an object-level choice OR should it be at the method/function level where an additional parameter sets which data source to use for that specific moment?
 		
+		Moreover, as of March 2012, the city, county and state have come together to create MetroChicagoData.org, a Socrata driven portal that brings data from the City of Chicago, Cook County and the State of Illinois into one single interface. Thus future versions of this class may adopt the single all encompassing portal. For now support for all four is being maintained. 		
 		
 	*/
 	
@@ -57,7 +57,7 @@ class windy {
 	 * 
 	 *	@access	public
 	 *	@param	string	$source is flag to set which Socrata data source to use, City of Chicago's, Cook County's or State of Illinois'. Takes
-	 *						'city' for City of Chicago, 'county' for Cook County and 'state' for State of Illinois
+	 *						'city' for City of Chicago, 'county' for Cook County, 'state' for State of Illinois and 'federated' for Metro Chicago Data
 	 *	@param	string	$format is what format to provide the data in. Supported format types include:
 	 *						JSON, XML, RDF, XLS and XLSX (Execl), CSV, TXT, PDF
 	 *						If JSON is chosen, the default option, then the next argument, $type allows for accessing the data from an object
@@ -82,6 +82,10 @@ class windy {
 		} else if ( $source == 'city' ) {
 		
 			$this->apiURL = $this->chicagoAPIURL;
+		
+		} else if ( $source == 'federated' ) {
+		
+			$this->apiURL = $this->combinedAPIURL;
 		
 		}
 	

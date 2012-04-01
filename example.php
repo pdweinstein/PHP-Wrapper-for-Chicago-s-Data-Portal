@@ -8,6 +8,9 @@
 	// Create an object to get city data
 	$chicago = new windy( 'city' );
 
+	// Get the documents on how to use the data portal 
+	//echo var_dump( $chicago->getDocs() );
+
 	// Let's find any views that describe themselves as about Chicago's neighborhood boundaries and are tagged with KML data
 	$views = $chicago->getViews( '', '', 'neighborhood boundaries', 'kml', '', 'false', '', '' );
 	
@@ -40,9 +43,6 @@
 	
 	}
 
-	// Get the documents on how to use the data portal 
-	//echo var_dump( $chicago->getDocs() );
-
 	// Create an object to get county data
 	$cook = new windy( 'county' );
 
@@ -58,5 +58,28 @@
 
 	// Create an object to get state data
 	$illinois = new windy( 'state' );
+
+	// Let's find any views that describe the statewide traffic
+	$views = $illinois->getViews( '', '', '', 'traffic', '', 'false', '', '' );
+	
+	echo "Here are the views with a description including 'traffic':\n";
+	foreach ( $views as $view ) {
+	
+		echo "View ID: ".$view->id. " is named " .$view->name. " and is described as a " .$view->description. "\n\n";
+	
+	}	
+	
+	// Create an object to get data from MetroChicagoData
+	$federated = new windy( 'federated' );
+	
+	$views = $federated->getViews( '', '', '', 'procurement', '', 'false', '', '' );
+	
+	echo "Here are the views with a description including 'procurement':\n";
+	foreach ( $views as $view ) {
+	
+		echo "View ID: ".$view->id. " is named " .$view->name. " and is described as a " .$view->description. "\n\n";
+	
+	}
+	
 
 ?>
