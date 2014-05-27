@@ -446,7 +446,7 @@ class windy {
 	public function getRows( $viewID, $row_ids_only = 'false', $max_rows, $include_ids_after, $search, $meta = 'true', $as_hashes = 'false', $most_recent = 'true', $access_type ) {
 	
 			$args = 'row_ids_only=' .urlencode( $row_ids_only ). '&max_rows=' .urlencode( $max_rows ). '&include_ids_after=' .urlencode( $include_ids_after ). '&search=' .urlencode( $search ). '&meta=' .urlencode( $meta ). '&as_hashes=' .urlencode( $as_hashes ). '&most_recent=' .urlencode( $most_recent ). '&access_type=' .urlencode( $access_type );
-		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. 'rows.' .$this->format, $args );
+		$response = $this->httpRequest( $this->apiURL. 'views/' .$viewID. '/rows.' .$this->format, $args );
 
 		if (( $this->format == 'json' ) AND ( $this->type == 'object' )) {
 		
